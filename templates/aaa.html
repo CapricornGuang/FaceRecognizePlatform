@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+	<title>Face Recognize Platform</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="description" content="Face Recognize Platform" />
+	<meta name="keywords" content="small, corporation" />
+	<link rel="stylesheet" href="\static\css\style.css" type="text/css" />
+</head>
+
+<style>
+    /* mirror the image */
+    video, canvas {
+    transform: scale(-1, 1); /*For Firefox (& IE) */
+    -webkit-transform: scale(-1, 1); /*for Chrome & Opera (& Safari) */
+}
+</style>
+
+
+<body>
+	<div id="content">
+		<div id="top">
+			<p><a href="#">BUAA</a><a href="#">Pattern Recognize</a><a href="#">Reward</a><a href="#">github</a></p>
+			<form id="search_engine" method="post" action="." accept-charset="UTF-8">
+				<p><input class="searchfield" name="search_query" type="text" id="keywords" value="Search Keywords" onfocus="document.forms['search_engine'].keywords.value='';" onblur="if (document.forms['search_engine'].keywords.value == '') document.forms['search_engine'].keywords.value='Search Keywords';" />
+				<input class="searchbutton" name="submit" type="submit" value="Search" /></p>
+			</form>
+		</div>
+
+		<div id="logo">
+			<h1><a href="#">Face Recognition Platform</a></h1>
+			<p>YiMing Wang, ChenHong Yang, RenJie Luo, YuGuang Yang</p>
+		</div>
+
+
+		<ul id="menu">
+			<li><a class="current" href="#">Face Detection</a></li>
+			<li><a href="#">Image Embedding</a></li>
+			<li><a href="#">Django DataBase</a></li>
+			<li><a href="#">People Searching</a></li>
+		</ul>
+
+
+		<div id="main">
+			<h3><a href="#">Here we will</a> <a href="#"><strong> not </strong></a> <a href="#">collect your information if you don't tick "Camera"</a></h3>
+			<h2><a href="#">Camera</a></h2>
+			<video id="myVideo" autoplay></video>
+			<script>
+
+				let v = document.getElementById("myVideo");
+
+				//create a canvas to grab an image for upload
+				let imageCanvas = document.createElement('canvas');
+				let imageCtx = imageCanvas.getContext("2d");
+
+				//Add file blob to a form and post
+				function postFile(file) {
+					let formdata = new FormData();
+					formdata.append("image", file);
+					let xhr = new XMLHttpRequest();
+					xhr.open('POST', 'http://localhost:5000/', true);
+					xhr.onload = function () {
+						if (this.status === 200){
+							var path = JSON.parse(this.response)['path']
+							console.log(this.response['path']);
+							$('#img').attr('src',path);
+						}
+						else
+							console.error(xhr);
+					};
+					xhr.send(formdata);
+				}
+
+				//Get the image from the canvas
+				function sendImagefromCanvas() {
+
+					//Make sure the canvas is set to the current video size
+					imageCanvas.width = v.videoWidth;
+					imageCanvas.height = v.videoHeight;
+
+					imageCtx.drawImage(v, 0, 0, v.videoWidth, v.videoHeight);
+
+					//Convert the canvas to blob and post the file
+					imageCanvas.toBlob(postFile, 'image/jpeg');
+				}
+
+				//Take a picture on click
+				v.onclick = function() {
+					console.log('click');
+					sendImagefromCanvas();
+				};
+
+				window.onload = function () {
+
+					//Get camera video
+					navigator.mediaDevices.getUserMedia({video: {width: 640, height: 360}, audio: false})
+						.then(stream => {
+							v.srcObject = stream;
+						})
+						.catch(err => {
+							console.log('navigator.getUserMedia error: ', err)
+						});
+
+				};
+
+			</script>
+
+
+		</div>
+
+
+
+		<div id="shortnews">
+
+			<div class="news">
+
+
+						<form action="/" id="uploadForm" method="post" enctype="multipart/form-data" >
+							<button class="btn btn-danger" type="submit" ><h3>Enter Photo to experience</h3> </button>
+							<input type="file" name="photo">
+						</form>
+
+
+						<p>MTCNN will be first emploied to CAPTURE your face, then FaceNet will embed your photo to a tensor, which will be stored in our Django Database next</p>
+			</div>
+
+
+			<h3><a href="#">Who are there?! It's you!</a></h3>
+			<!-- 这个地方展示回传的图片 -->
+
+			{% if output %}
+			<p><img src="{{url_for('static',filename=output)}}" alt="Car" id="img" width="200" height="250"/></p>
+			{% endif %}
+
+
+
+		</div>
+
+		<div id="line"></div>
+		<div id="footer">
+			<ul id="fr" class="links">
+				<li><a href="" title="Course Center">Course: Pattern Recognize</a></li>
+				<li><a href="https://kpzhang93.github.io/MTCNN_face_detection_alignment/paper/spl.pdf" title="MTCNN's source article">Face Detection Models: MTCNN</a></li>
+				<li><a href="https://arxiv.org/pdf/1503.03832.pdf" title="FaceNet's source article">Face Embedding Models: FaceNet</a></li>
+			</ul>
+			<div id="fl">
+				<p class="links"><a href="#">YiMing Wang</a><a href="#">ChenHong Yang</a><a href="#">RenJie Luo</a><a href="#">YuGuang Yang</a></p>
+				<p>This Website is a part of Face Recognize Project, which is combined of two main functions  — Face Detection and Face Recognization. Yuguang Yang and YiMing Wang are responsible for Detection part. RenJie Luo and ChenHong Yang are responsible for Recognization part</p>
+				<p>  <strong>Face Recognize Platform</strong> &middot;  <a title="Awsome Web Templates" href="https://github.com/CapricornGuang/">github.com/CapricornGuang/</a></p>
+			</div>
+		</div>
+	</div>
+<style>
+.copyrights{text-indent:-9999px;height:0;line-height:0;font-size:0;overflow:hidden;}
+</style>
+
+
+
+</body>
+
+</html>
